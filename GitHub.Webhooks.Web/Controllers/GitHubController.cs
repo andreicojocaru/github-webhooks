@@ -6,11 +6,11 @@ namespace GitHub.Webhooks.Web.Controllers
 {
     [ApiController]
     [Route("github")]
-    public class GitHub : ControllerBase
+    public class GitHubController : ControllerBase
     {
         private GitHubClientProvider gitHubClientProvider;
 
-        public GitHub(GitHubClientProvider clientProvider)
+        public GitHubController(GitHubClientProvider clientProvider)
         {
             gitHubClientProvider = clientProvider;
         }
@@ -35,14 +35,6 @@ namespace GitHub.Webhooks.Web.Controllers
             await gitHubClientProvider.CreateAccessTokenAsync(code);
 
             return Redirect("/swagger");
-        }
-
-        [Route("orgs")]
-        [HttpGet]
-        public async Task<IReadOnlyList<Organization>> Organizations()
-        {
-            var orgs = await gitHubClientProvider.Client.Organization.GetAllForCurrent();
-            return orgs;
         }
     }
 }

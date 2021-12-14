@@ -24,7 +24,7 @@ namespace GitHub.Webhooks.Client
         {
             var request = new OauthLoginRequest(clientId)
             {
-                Scopes = { "user" }
+                Scopes = { "user", "repo" }
             };
 
             return Client.Oauth.GetGitHubLoginUrl(request);
