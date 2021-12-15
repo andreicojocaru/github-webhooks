@@ -1,5 +1,19 @@
 # GitHub Webhooks Challenge
 
+- [GitHub Webhooks Challenge](#github-webhooks-challenge)
+  - [Summary](#summary)
+  - [Running the project](#running-the-project)
+    - [Setup](#setup)
+    - [Authorizing the GitHub Client](#authorizing-the-github-client)
+    - [Receiving Repository events from GitHub](#receiving-repository-events-from-github)
+  - [Project Structure](#project-structure)
+    - [Web Service](#web-service)
+      - [GitHubAuthController](#githubauthcontroller)
+      - [GitHubWebhooksController](#githubwebhookscontroller)
+    - [GitHub Client](#github-client)
+      - [Business Logic](#business-logic)
+      - [Object Builders](#object-builders)
+
 ## Summary
 
 The project is a simple Web service that listens to a GitHub Organization `repository` events, and creates basic protection rules for the default (main) branch.
@@ -11,14 +25,14 @@ The project is written in **C#**, using **ASP Core**, running on the **.NET 6** 
 
 > Note: This project connects to the GitHub API using the .NET client, [Octokit.net](https://github.com/octokit/octokit.net), and the credentials are generated using the **OAuth flow**. This choice was made to have a better control over the user tokens, and to remove any potential information leak. In a real scenario, where the Web Service needs to be constantly connected to the GitHub API (self-refreshing tokens) without any user interaction, a `basic authentication` approach makes more sense, and the GitHub Client will be initialized using a `username` and `password`.
 
-### Setup:
+### Setup
 - install [.NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) from the official website
 - install [Visual Studio](https://visualstudio.microsoft.com/) from the official website
 - clone the Repository, and open the `GitHub.Webhooks.sln` solution in Visual Studio
 - *because we use OAuth to authenticate against the GitHub API* - create a OAuth application in your GitHub account [following the Octokit.net docs](https://github.com/octokit/octokit.net/blob/main/docs/oauth-flow.md). Use the `https://localhost:[port]/github/authorize` redirect URI.
 - replace the `ClientId` and `ClientSecret` values in the `GitHub.Webhooks.Web/appsettings.json` file
 
-### Authorizing the GitHub Client: 
+### Authorizing the GitHub Client
 - `Build` and `Run` the project in Visual Studio
 - a Swagger API page should be displayed, with 3 endpoints visible
 
@@ -28,7 +42,7 @@ The project is written in **C#**, using **ASP Core**, running on the **.NET 6** 
 - after the Grant was given, the GitHub Client has been authorized. (*Note: the Authorization step is required every time you run the project*)
 - your project is now ready to receive GitHub Webhooks!
 
-### Receiving Repository events from GitHub:
+### Receiving Repository events from GitHub
 - if you don't already have a GitHub Organization, create one ([follow official docs](https://docs.github.com/en/organizations/collaborating-with-groups-in-organizations/creating-a-new-organization-from-scratch))
 - in your Organization Settings, go to the `Webhooks` page and create a new Webhook ([follow official docs](https://docs.github.com/en/developers/webhooks-and-events/webhooks/creating-webhooks))
 - the new Webhook should only contain the `repository` events, the rest we don't need for the scope of this project
@@ -43,7 +57,7 @@ Creating a new Repository in the Organization, should send a Webhook event to th
 The `GitHub.Webhooks.Web` project is a ASP WebAPI project, using the .NET 6 platform.
 It contains two Controllers: `GitHubAuthController` and `GitHubWebhooksController`.
 
-### GitHubAuthController
+#### GitHubAuthController
 
 The `GitHubAuthController` contains the GitHub Client authorization endpoints. 
 
@@ -51,7 +65,7 @@ The `GET /github/login` endpoint will initiate the OAuth flow, with required use
 
 The `GET /github/authorize` endpoint is used as an Authorized Redirect URL, when GitHub will be sending the Authorization Code back to the Web Service (part of the OAuth flow. [More on the OAuth flow here](https://docs.github.com/en/developers/apps/building-oauth-apps/authorizing-oauth-apps)).
 
-### GitHubWebhooksController
+#### GitHubWebhooksController
 
 The `GitHubWebhooksController` contains the Webhook callbacks for handling GitHub webhook events.
 
@@ -84,7 +98,7 @@ BranchProtectionSettingsUpdate request = new BranchProtectionBuilder()
 
 As one can see, the Builder design pattern, allows exposing a clear API for building the desired state, easy to understand, maintain and extend.
 
-The `NewIssueBuilder` also follows the Builder design pattern to allow creating a GitHub *Issue* object with the desired state. Compared to the previous implementation of the `BranchProtectionBuilder`, the `NewIssueBuilder` also exposes a `static` method, exposing a `Factory` way of creating an Builder. 
+The `NewIssueBuilder` also follows the Builder design pattern to allow creating a GitHub *Issue* object with the desired state. Compared to the previous implementation of the `BranchProtectionBuilder`, the `NewIssueBuilder` also exposes a `static` method, exposing a `Factory` way of creating a Builder. 
 
 The [Factory Method](https://en.wikipedia.org/wiki/Factory_method_pattern) is another useful design pattern which allows creating of desired Object state from a previous state, without having to configure every aspect of the new state.
 
