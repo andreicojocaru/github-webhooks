@@ -24,6 +24,11 @@ namespace GitHub.Webhooks.Web.Controllers
                 return BadRequest("Repository is missing in the Webhook body");
             }
 
+            if(model.Action != GitHubModelConstants.RepositoryCreated)
+            {
+                return NoContent();
+            }
+
             await branchProtectionService.CreateDefaultBranchProtectionAsync(model.Repository.Id);
             return Accepted();
         }
