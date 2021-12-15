@@ -11,6 +11,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.Configure<GitHubSettings>(builder.Configuration.GetSection("GitHub"));
 builder.Services.AddSingleton<GitHubClientProvider>();
+builder.Services.AddSingleton<GitHubBranchProtectionService>();
 
 // Load receivers
 

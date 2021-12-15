@@ -1,7 +1,6 @@
 ﻿using GitHub.Webhooks.Client;
 using GitHub.Webhooks.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using Octokit;
 
 namespace GitHub.Webhooks.Web.Controllers
 {
@@ -9,30 +8,23 @@ namespace GitHub.Webhooks.Web.Controllers
     [Route("github/webhooks")]
     public class GitHubWebhooksController : ControllerBase
     {
-        private GitHubClientProvider gitHubClientProvider;
+        private readonly GitHubBranchProtectionService branchProtectionService;
 
-        public GitHubWebhooksController(GitHubClientProvider clientProvider)
+        public GitHubWebhooksController(GitHubBranchProtectionService branchProtectionService)
         {
-            gitHubClientProvider = clientProvider;
+            this.branchProtectionService = branchProtectionService;
         }
 
         [Route("repository")]
         [HttpPost]
         public async Task<IActionResult> Repository([FromBody] GitHubWebhookRepositoryModel model)
         {
-            Console.Write(model.Repository.Name);
+            if (model.Repository == null)
+            {
+                return BadRequest("Repository is missing in the Webhook body");
+            }
 
-            var issue = new NewIssue("Test Issue");
-            issue.Body = "# This is a new issue from code.";
-
-            var repository = await gitHubClientProvider.Client.Repository.Get(model.Repository.Id);
-
-            var protection = new BranchProtectionSettingsUpdate(new BranchProtectionRequiredReviewsUpdate(true, true, 1));
-
-            var settings = await gitHubClientProvider.Client.Repository.Branch.UpdateBranchProtection(repository.Id, "main", protection);
-
-            //await gitHubClientProvider.Client.Issue.Create(repository.Id, issue);
-
+            await branchProtectionService.CreateDefaultBranchProtectionAsync(model.Repository.Id);
             return Accepted();
         }
     }

@@ -1,16 +1,15 @@
 ﻿using GitHub.Webhooks.Client;
 using Microsoft.AspNetCore.Mvc;
-using Octokit;
 
 namespace GitHub.Webhooks.Web.Controllers
 {
     [ApiController]
     [Route("github")]
-    public class GitHubController : ControllerBase
+    public class GitHubAuthController : ControllerBase
     {
         private GitHubClientProvider gitHubClientProvider;
 
-        public GitHubController(GitHubClientProvider clientProvider)
+        public GitHubAuthController(GitHubClientProvider clientProvider)
         {
             gitHubClientProvider = clientProvider;
         }

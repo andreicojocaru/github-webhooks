@@ -2,12 +2,12 @@
 {
     public class GitHubWebhookRepositoryModel
     {
-        public GitHubRepository Repository { get; set; }
+        public GitHubRepository? Repository { get; set; }
     }
 
     public class GitHubRepository
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string Name { get; set; }
     }
 }
